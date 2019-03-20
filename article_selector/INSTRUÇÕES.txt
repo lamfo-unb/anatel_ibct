@@ -1,0 +1,16 @@
+Instruções para a execução dos códigos que alimentam o shiny de artigos:
+
+1) Escolher algum dos dois sites para realizar a pesquisa do tema.
+
+2) Crie uma pasta download no repositório
+
+3) Executar o script em python para o download dos arquivos bibtex.
+	
+	- O script executa os downloads a partir de uma lista de assuntos dados, caso queira apenas um assunto coloque o assunto envolto em
+	  colchetes e o texto do assunto entre aspas. Ex.: ["Qualidade Pecebida"]. Caso queira mais de um assunto, efetue o mesmo processo
+	  separando os assuntos por vírgulas. Ex.: ["Qualidade Percebida", "Telemarketing"].
+
+3) Após realizar o download dos arquivos bibtex, execute o script em R chamado bib_cleaner. O esqueleto deste arquivo já está completo e
+automatizado, se o endereço de download não for alterado não é necessária nenhuma alteração nesse script, apenas o execute.
+
+4) Com isso pronto, o arquivo gerado pode ser utilizado no shiny dos artigos.
