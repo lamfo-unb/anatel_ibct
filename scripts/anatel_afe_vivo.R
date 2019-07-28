@@ -9,32 +9,41 @@ library(polycor)
 
 
 df <- read.csv("C:\\Users\\amori\\OneDrive\\Documentos\\UnB\\LAMFO\\ANATEL\\BD_PRE.csv")
+#Separar base de dados por operadora
+df_afe_oi <- df %>% filter(OPERADORA == "OI")
+df_afe_tim <- df %>% filter(OPERADORA == "TIM")
+df_afe_claro <- df %>% filter(OPERADORA == "CLARO")
+df_afe_algar <- df %>% filter(OPERADORA == "ALGAR")
+df_afe_vivo <- df %>% filter(OPERADORA == "VIVO")
+df_afe_sercomtel <- df %>% filter(OPERADORA == "SERCOMTEL")
+df_afe_nextel <- df %>% filter(OPERADORA == "NEXTEL")
+
 #separar bases em tipos: likert e sim x não 
 
-df_likert <- df %>% select(B1_1, B1_2, C1_1, C1_2, D2_1, D2_2, D2_3, E1_1, E1_2, E1_3, A2_1, A2_2, A2_3, A3, A4, A5, F2, F4, F6)
-df_likert[df_likert == "99"] <- NA
-df_sn <- df %>% select(Q1, Q3, Q4, Q5, D1, F1, F3, F5 , I1, I2, A1_1, A1_2, A1_3, A1_4)
-df_sn[df_sn == "99"] <- NA
-df_sn <- df_sn %>% 
+df_afe_vivo_likert <- df_afe_vivo %>% select(B1_1, B1_2, C1_1, C1_2, D2_1, D2_2, D2_3, E1_1, E1_2, E1_3, A2_1, A2_2, A2_3, A3, A4, A5, F2, F4, F6)
+df_afe_vivo_likert[df_afe_vivo_likert == "99"] <- NA
+df_afe_vivo_sn <- df_afe_vivo %>% select(Q1, Q3, Q4, Q5, D1, F1, F3, F5 , I1, I2, A1_1, A1_2, A1_3, A1_4)
+df_afe_vivo_sn[df_afe_vivo_sn == "99"] <- NA
+df_afe_vivo_sn <- df_afe_vivo_sn %>% 
                     mutate(A1_1 = ifelse(is.na(A1_1), 0, 1),
                             A1_2 = ifelse(is.na(A1_2), 0, 1),
                             A1_3 = ifelse(is.na(A1_3), 0, 1),
                             A1_4 = ifelse(is.na(A1_4), 0, 1)) 
-df_sn[df_sn == "2"] <- 0 
+df_afe_vivo_sn[df_afe_vivo_sn == "2"] <- 0 
 
 ######################### Análise Fatorial Exporatória - Escala Likert####################################
                            
 #percentual de NA 
 # total de linhas
-n = nrow(df_likert)
+n = nrow(df_afe_vivo_likert)
 
 # porcentagem de NA por coluna
-round(colSums(is.na(df_likert))*100/n, 2)
+round(colSums(is.na(df_afe_vivo_likert))*100/n, 2)
 #Colunas com mais de 60% de NA foram desconsideradas 
-df_likert <- df_likert %>% select(-A4, -A5, -F2, -F4, -F6)
+df_afe_vivo_likert <- df_afe_vivo_likert %>% select(-A4, -A5, -F2, -F4, -F6)
 #calcular matriz de correlação policórica e índice KMO 
-df_likert_na <- na.omit(df_likert)
-corpoly <- hetcor(df_likert_na, use="complete.obs", ML = TRUE)
+df_afe_vivo_likert_na <- na.omit(df_afe_vivo_likert)
+corpoly <- hetcor(df_afe_vivo_likert_na, use="complete.obs", ML = TRUE)
 
 corpoly2 <- corpoly$correlations
 
@@ -55,15 +64,15 @@ kmo <- function(x)
   return(list(KMO=KMO, MSA=MSA))
 } 
 
-kmo(df_likert_na)
-# [1] 0.9364679 - Fatorável 
+kmo(df_afe_vivo_likert_na)
+# [1] 0.9335901 - Fatorável 
 
 #análise fatorial 1 - pca + análise fatorial
 
-acpcor <- prcomp(df_likert_na, scale = TRUE)
+acpcor <- prcomp(df_afe_vivo_likert_na, scale = TRUE)
 summary(acpcor)
 screeplot(acpcor,npcs = 15, type = "lines")
-plot(1:ncol(df_likert_na), acpcor$sdev^2, type = "b", xlab = "Componente",
+plot(1:ncol(df_afe_vivo_likert_na), acpcor$sdev^2, type = "b", xlab = "Componente",
           ylab = "Variância", pch = 20, cex.axis = 1.3, cex.lab = 1.3)
 
 
@@ -79,12 +88,12 @@ text(carfatr$loadings, rownames(carfat), adj = 1)
 
 #análise fatorial - psych 
 
-parallel <- fa.parallel(df_likert_na, fm = "minres", fa = "fa")
+parallel <- fa.parallel(df_afe_vivo_likert_na, fm = "minres", fa = "fa")
 
 #Parallel analysis suggests that the number of factors =  5  and the number of components =  NA 
 
 for(i in c(2:5)){
-  fact_i <- fa(df_likert_na,nfactors = i,rotate = "varimax",fm="minres")
+  fact_i <- fa(df_afe_vivo_likert_na,nfactors = i,rotate = "varimax",fm="minres")
   print(fact_i$loadings,cutoff = 0.3)}
 
 #No PCA, foi sugerido dois fatores quanto na Análise Paralela foram sugeridos 5,
@@ -99,23 +108,23 @@ print(fator_i$loadings, cutoff = 0.3)}
 
 #percentual de NA 
 # total de linhas
-n = nrow(df_sn)
+n = nrow(df_afe_vivo_sn)
 
 # porcentagem de NA por coluna
-round(colSums(is.na(df_sn))*100/n, 2)
+round(colSums(is.na(df_afe_vivo_sn))*100/n, 2)
 #desconsiderando as colunas com mais de 30% de NA 
-df_sn <- df_sn %>% select(-F5, -I2)
+df_afe_vivo_sn <- df_afe_vivo_sn %>% select(-F5, -I2)
 
 #calcular matriz de correlação policórica  
-df_sn_na <- na.omit(df_sn)
+df_afe_vivo_sn_na <- na.omit(df_afe_vivo_sn)
 #df_afe_vivo_sn_na <- sapply(df_afe_vivo_sn_na, as.factor)
 #corpoly_sn <- hetcor(df_afe_vivo_sn_na, ML = TRUE)
-cor_sn <- tetrachoric(df_sn_na)
+cor_sn <- tetrachoric(df_afe_vivo_sn_na)
 
-#analise fatorial - factanal() - Fator = 5 
+#analise fatorial - factanal()
 
-fit_5 <- factanal(covmat = cor_sn$rho, factors = 5, rotation = "varimax")
-print(fit_5$loadings,cutoff = 0.3)
+fit_2 <- factanal(covmat = cor_sn$rho, factors = 2, rotation = "varimax")
+print(fit_2$loadings,cutoff = 0.3)
 
 #analise fatorial - psysh - fa()
 
